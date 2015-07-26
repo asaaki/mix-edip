@@ -10,7 +10,7 @@ defmodule Mix.Tasks.Edip do
   defp deps do
     [
       {:exrm, "~> 0.18"},
-      {:edip, github: "asaaki/mix-edip"}
+      {:edip, "~> 0.1"}
     ]
   end
   ```

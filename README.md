@@ -27,7 +27,7 @@ In mix.exs:
 defp deps do
   [
     {:exrm, "~> 0.18"},
-    {:edip, github: "asaaki/mix-edip"}
+    {:edip, "~> 0.1"}
   ]
 end
 ```
