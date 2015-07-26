@@ -1,6 +1,7 @@
 # EDIP mix task
 
 A mix task for [EDIP (elixir docker image packager)](https://github.com/asaaki/elixir-docker-image-packager).
+
 <!--
   TOC generaged with doctoc: `npm install -g doctoc`
 
@@ -23,21 +24,17 @@ EDIP creates a docker image of your application release.
 
 In mix.exs:
 
-```elixir
-defp deps do
-  [
-    {:exrm, "~> 0.18"},
-    {:edip, "~> 0.1"}
-  ]
-end
-```
+    defp deps do
+      [
+        {:exrm, "~> 0.18"},
+        {:edip, "~> 0.1"}
+      ]
+    end
 
 ## Usage
 
-```shell
-mix deps.get edip && mix deps.compile edip
-mix edip
-```
+    mix deps.get edip && mix deps.compile edip
+    mix edip
 
 ## Options
 

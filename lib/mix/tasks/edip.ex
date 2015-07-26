@@ -6,21 +6,17 @@ defmodule Mix.Tasks.Edip do
 
   In mix.exs:
 
-  ```elixir
-  defp deps do
-    [
-      {:exrm, "~> 0.18"},
-      {:edip, "~> 0.1"}
-    ]
-  end
-  ```
+      defp deps do
+        [
+          {:exrm, "~> 0.18"},
+          {:edip, "~> 0.1"}
+        ]
+      end
 
   ## Usage
 
-  ```shell
-  mix deps.get edip && mix deps.compile edip
-  mix edip
-  ```
+      mix deps.get edip && mix deps.compile edip
+      mix edip
 
   ## Options
 
