@@ -10,7 +10,7 @@ defmodule Edip.Runner do
   def run(args) do
     options = options(args)
     info "Packaging your app release into a docker image"
-    info "Build settings: #{package_make_vars(options)}"
+    info "Package settings: #{package_make_vars(options)}"
     run_steps(options)
   end
 
@@ -64,7 +64,7 @@ defmodule Edip.Runner do
   defp is_valid_file?(_),            do: true
 
   defp package_release(opts) do
-    info "Building ..."
+    info "Packaging ..."
     silent = silent?(opts)
     do_cmd("make -C #{work_dir} #{package_make_vars(opts)}", silent_build?(silent))
   end
