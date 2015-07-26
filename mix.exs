@@ -7,7 +7,7 @@ defmodule Edip.Mixfile do
     [
       app:         :edip,
       name:        "edip",
-      version:     "0.1.1",
+      version:     "0.1.2",
       elixir:      "~> 1.0",
       description: description,
       docs:        &docs/0,
