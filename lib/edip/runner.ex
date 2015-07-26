@@ -2,8 +2,10 @@ defmodule Edip.Runner do
   import Edip.Utils
   import Edip.Options
 
-  @edip_repo "https://github.com/asaaki/elixir-docker-image-packager.git"
-  @edip_dir  ".edip"
+  @edip_dir      ".edip"
+  @edip_version  "0.1.0"
+  @edip_repo     "https://github.com/asaaki/elixir-docker-image-packager.git"
+  @clone_options "--depth 1 --single-branch --branch v#{@edip_version}"
 
   def run(args) do
     options = options(args)
@@ -37,7 +39,7 @@ defmodule Edip.Runner do
 
   defp clone_edip do
     info "Download EDIP ..."
-    do_cmd("git clone #{@edip_repo} #{@edip_dir}", &ignore/1)
+    do_cmd("git clone #{@clone_options} #{@edip_repo} #{@edip_dir}", &ignore/1)
   end
 
   defp recreate_app_dir do
