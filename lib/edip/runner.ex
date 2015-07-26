@@ -18,6 +18,7 @@ defmodule Edip.Runner do
     create_work_dir(force || !work_dir_okay?)
     recreate_app_dir
     copy_app_files
+    reset_edip_log_file
     package_release(opts)
     info "The image is ready! You can check with `docker images`"
   end
@@ -66,8 +67,18 @@ defmodule Edip.Runner do
     do_cmd("make -C #{work_dir} #{package_make_vars(opts)}", silent_build?(silent))
   end
 
-  defp silent_build?(true), do: &ignore/1
+  defp silent_build?(true), do: &silent_log/1
   defp silent_build?(false), do: &IO.write/1
+
+  defp silent_log(data) do
+    File.write(edip_log_file, data, [:append])
+  end
+
+  def reset_edip_log_file do
+    File.rm_rf!(edip_log_file)
+  end
+
+  defp edip_log_file, do: current_dir <> "/.edip.log"
 
   defp package_make_vars(opts) do
     {_, vars} = {opts, []} |> package_name |> package_tag |> package_prefix
