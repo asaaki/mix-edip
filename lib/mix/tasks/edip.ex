@@ -9,7 +9,7 @@ defmodule Mix.Tasks.Edip do
       defp deps do
         [
           {:exrm, "~> 0.18"},
-          {:edip, "~> 0.1"}
+          {:edip, "~> 0.2"}
         ]
       end
 
