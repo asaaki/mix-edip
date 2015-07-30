@@ -38,23 +38,28 @@ In mix.exs:
 
 ## Options
 
-    # Override the (repository) name of the docker image
+    # Override the (repository) name of the docker image.
     mix edip --name <NAME>
     mix edip -n <NAME>
 
-    # Set a specific tag for the docker image
+    # Set a specific tag for the docker image.
     mix edip --tag <TAG>
     mix edip -t <TAG>
 
-    # Set only a specific prefix for the docker image name (default: local)
+    # Set only a specific prefix for the docker image name (default: local).
     mix edip --prefix <PREFIX>
     mix edip -p <PREFIX>
+
+    # Get the tarball from the packaging (true), without even creating the docker image (only).
+    # The tarballs can be found in the `.edip/tarballs` directory.
+    mix edip --tarball true|only
+    mix edip -a true|only
 
     # Force redownload of EDIP tool
     mix edip --force
     mix edip -f
 
-    # Silence build output of EDIP (will be logged to .edip.log instead)
+    # Silence build output of EDIP (will be logged to `.edip.log` instead).
     mix edip --silent
     mix edip -s
 

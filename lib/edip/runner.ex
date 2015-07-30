@@ -83,7 +83,7 @@ defmodule Edip.Runner do
   defp edip_log_file, do: current_dir <> "/.edip.log"
 
   defp package_make_vars(opts) do
-    {_, vars} = {opts, []} |> package_name |> package_tag |> package_prefix
+    {_, vars} = {opts, []} |> package_name |> package_tag |> package_prefix |> package_tarball
     vars |> Enum.join(" ")
   end
 
@@ -105,6 +105,21 @@ defmodule Edip.Runner do
     case Dict.get(opts, :prefix) do
       nil    -> {opts, vars}
       prefix -> {opts, ["PREFIX=#{prefix}" | vars]}
+    end
+  end
+
+  defp package_tarball({opts, vars}) do
+    case Dict.get(opts, :tarball) do
+      nil     -> {opts, vars}
+      tarball -> parse_tarball_option({opts, vars, tarball})
+    end
+  end
+
+  defp parse_tarball_option({opts, vars, tarball}) do
+    case tarball do
+      "true" -> {opts, ["TARBALL=true" | vars]}
+      "only" -> {opts, ["TARBALL=only" | vars]}
+      _      -> {opts, vars}
     end
   end
 end

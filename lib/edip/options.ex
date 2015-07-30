@@ -1,6 +1,6 @@
 defmodule Edip.Options do
-  @option_aliases [n: :name, t: :tag, p: :prefix, f: :force, s: :silent]
-  @option_stricts [name: :string, tag: :string, prefix: :string, force: :boolean, silent: :boolean]
+  @option_aliases [n: :name, t: :tag, p: :prefix, a: :tarball, f: :force, s: :silent]
+  @option_stricts [name: :string, tag: :string, prefix: :string, tarball: :string, force: :boolean, silent: :boolean]
 
   def options(args) do
     {valid_opts, _, _} = OptionParser.parse(args, aliases: @option_aliases, strict: @option_stricts)
