@@ -3,7 +3,7 @@ defmodule Edip.Runner do
   import Edip.Options
 
   @edip_dir      ".edip"
-  @edip_version  "v0.2.0"
+  @edip_version  "v0.2.1"
   @edip_repo     "https://github.com/asaaki/elixir-docker-image-packager.git"
   @clone_options "--depth 1 --single-branch --branch #{@edip_version}"
 
