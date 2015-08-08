@@ -16,15 +16,17 @@ defmodule Edip.Utils do
   @doc "Exits with exit status 1"
   def abort!, do: exit({:shutdown, 1})
 
-  # Ignore a message when used as the callback for Mix.Shell.cmd
+  @doc "Ignore a message when used as the callback for Mix.Shell.cmd"
   def ignore(_), do: nil
 
   # do_cmd("command", &ignore/1)
   # do_cmd("command", &IO.write/1)
-  def do_cmd(command, callback) do
+  def do_cmd(command, callback, step) do
     case cmd(command, callback) do
       0 -> :ok
-      _ -> {:error, "Release step failed. Please fix any errors and try again."}
+      _ ->
+        error("#{step} stage failed. Please fix any errors and try again.")
+        abort!
     end
   end
 end

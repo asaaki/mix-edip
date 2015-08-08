@@ -39,7 +39,7 @@ defmodule Edip.Runner do
 
   defp clone_edip do
     info "Download EDIP ..."
-    do_cmd("git clone #{@clone_options} #{@edip_repo} #{@edip_dir}", &ignore/1)
+    do_cmd("git clone #{@clone_options} #{@edip_repo} #{@edip_dir}", &ignore/1, "Downloading EDIP")
   end
 
   defp recreate_app_dir do
@@ -66,7 +66,7 @@ defmodule Edip.Runner do
   defp package_release(opts) do
     info "Packaging ..."
     silent = silent?(opts)
-    do_cmd("make -C #{work_dir} #{package_make_vars(opts)}", silent_build?(silent))
+    do_cmd("make -C #{work_dir} #{package_make_vars(opts)}", silent_build?(silent), "Packaging release")
   end
 
   defp silent_build?(true), do: &silent_log/1
