@@ -1,125 +1,178 @@
 defmodule Edip.Runner do
   import Edip.Utils
-  import Edip.Options
+  alias Edip.Options
+  alias Edip.ImageConfig
+  alias Edip.Settings
 
-  @edip_dir      ".edip"
-  @edip_version  "v0.2.1"
-  @edip_repo     "https://github.com/asaaki/elixir-docker-image-packager.git"
-  @clone_options "--depth 1 --single-branch --branch #{@edip_version}"
+  @edip_version          "0.3.0"
+  @edip_tool             "asaaki/edip-tool:#{@edip_version}"
+  @docker_cmd            "docker"
+  @docker_run            "#{@docker_cmd} run --rm"
+  @docker_import         "#{@docker_cmd} import"
+  @docker_tag            "#{@docker_cmd} tag --force"
+  @tarball_dir_name      "tarballs"
+  @artifact_config       "artifact.cfg"
+  @container_source_dir  "/source"
+  @container_tarball_dir "/stage/tarballs"
 
   def run(args) do
-    options = options(args)
+    options = Options.from_args(args)
     info "Packaging your app release into a docker image"
-    info "Package settings: #{package_make_vars(options)}"
     run_steps(options)
   end
 
-  defp run_steps(opts) do
-    force = force_recreate?(opts)
-    remove_work_dir(force)
-    create_work_dir(force || !work_dir_okay?)
-    recreate_app_dir
-    copy_app_files
-    reset_edip_log_file
-    package_release(opts)
-    info "The image is ready! You can check with `docker images`"
+  defp run_steps(options) do
+    {:ok, :start, options}
+    |> check_app
+    |> check_exrm
+    |> reinit_log
+    |> step_build_artifact
+    |> step_build_image
+    |> evaluate_success_or_error
   end
 
-  defp current_dir,  do: File.cwd!
-  defp work_dir,     do: current_dir <> "/" <> @edip_dir
-  defp work_app_dir, do: work_dir <> "/app"
-
-  defp work_dir_okay?, do: File.exists?(work_dir) && File.dir?(work_dir)
-
-  defp remove_work_dir(true), do: File.rm_rf!(work_dir)
-  defp remove_work_dir(_),    do: :noop
-
-  defp create_work_dir(true), do: clone_edip
-  defp create_work_dir(_),    do: :noop
-
-  defp clone_edip do
-    info "Download EDIP ..."
-    do_cmd("git clone #{@clone_options} #{@edip_repo} #{@edip_dir}", &ignore/1, "Downloading EDIP")
-  end
-
-  defp recreate_app_dir do
-    File.rm_rf!(work_app_dir)
-    File.mkdir_p!(work_app_dir)
-  end
-
-  defp copy_app_files do
-    for file <- valid_app_files do
-      File.cp_r!(current_dir <> "/" <> file, work_app_dir <> "/" <> file)
+  defp check_app({:error, _, _} = error), do: error
+  defp check_app({_result, _msg, options}) do
+    case Mix.Project.get do
+      nil -> {:error, "No Mix project in this directory! Please ensure a mix.exs file is available.", options}
+      _   -> {:ok, :project_present, options}
     end
   end
 
-  defp current_app_files, do: File.ls!(current_dir)
-  defp valid_app_files, do: current_app_files |> Enum.filter(&is_valid_file?/1)
-
-  defp is_valid_file?(@edip_dir),    do: false
-  defp is_valid_file?(".git"),       do: false
-  defp is_valid_file?(".gitignore"), do: false
-  defp is_valid_file?("_build"),     do: false
-  defp is_valid_file?("deps"),       do: false
-  defp is_valid_file?(_),            do: true
-
-  defp package_release(opts) do
-    info "Packaging ..."
-    silent = silent?(opts)
-    do_cmd("make -C #{work_dir} #{package_make_vars(opts)}", silent_build?(silent), "Packaging release")
-  end
-
-  defp silent_build?(true), do: &silent_log/1
-  defp silent_build?(false), do: &IO.write/1
-
-  defp silent_log(data) do
-    File.write(edip_log_file, data, [:append])
-  end
-
-  def reset_edip_log_file do
-    File.rm_rf!(edip_log_file)
-  end
-
-  defp edip_log_file, do: current_dir <> "/.edip.log"
-
-  defp package_make_vars(opts) do
-    {_, vars} = {opts, []} |> package_name |> package_tag |> package_prefix |> package_tarball
-    vars |> Enum.join(" ")
-  end
-
-  defp package_name({opts, vars}) do
-    case Dict.get(opts, :name) do
-      nil  -> {opts, vars}
-      name -> {opts, ["NAME=#{name}" | vars]}
+  defp check_exrm({:error, _, _} = error), do: error
+  defp check_exrm({_result, _msg, options}) do
+    case has_exrm? do
+      true -> {:ok, :project_present, options}
+      _    -> {:error, "No `exrm` dependency found. Please add it to your project.", options}
     end
   end
 
-  defp package_tag({opts, vars}) do
-    case Dict.get(opts, :tag) do
-      nil -> {opts, vars}
-      tag -> {opts, ["TAG=#{tag}" | vars]}
+  defp reinit_log({:error, _, _} = error), do: error
+  defp reinit_log({_result, _msg, options}) do
+    {:ok, :reinit_log, options}
+    |> substep_delete_log
+    |> substep_add_log_header
+  end
+
+  defp substep_delete_log({:error, _, _, _} = error), do: error
+  defp substep_delete_log({_result, _msg, [silent: false] = options}), do: {:ok, :skip_log_deletion, options}
+  defp substep_delete_log({_result, _msg, options}) do
+    log_file = Edip.Utils.LogWriter.log_file
+    case File.rm_rf(log_file) do
+      {:ok, _}       -> {:ok, :log_file_deleted, options}
+      {:error, _, _} -> {:ok, :append_to_existing_log, options}
     end
   end
 
-  defp package_prefix({opts, vars}) do
-    case Dict.get(opts, :prefix) do
-      nil    -> {opts, vars}
-      prefix -> {opts, ["PREFIX=#{prefix}" | vars]}
+  defp substep_add_log_header({:error, _, _, _} = error), do: error
+  defp substep_add_log_header({_result, _msg, [silent: false] = options}), do: {:ok, :skip_log_header, options}
+  defp substep_add_log_header({_result, _msg, options}) do
+    header = """
+    EDIP tool v#{@edip_version}
+    DT(UTC): #{inspect :calendar.universal_time}
+    ================================================================================
+
+    """
+    Edip.Utils.LogWriter.write(header)
+
+    {:ok, :log_header_added, options}
+  end
+
+  defp step_build_artifact({:error, _, _} = error), do: error
+  defp step_build_artifact({_result, _msg, options}) do
+    info("Creating artifact (might take a while) ...")
+    command = "#{@docker_run} #{volumes} #{release_settings(options)} #{@edip_tool}"
+
+    options.writer.("$> #{command}\n")
+    case do_cmd(command, options.writer) do
+      0 ->
+        info("Artifact successfully created.")
+        {:ok, :artifact, options}
+      _ ->
+        {:error, "Artifact not created! Check for any errors above.", options}
     end
   end
 
-  defp package_tarball({opts, vars}) do
-    case Dict.get(opts, :tarball) do
-      nil     -> {opts, vars}
-      tarball -> parse_tarball_option({opts, vars, tarball})
+  defp step_build_image({:error, _, _} = error), do: error
+  defp step_build_image({_result, _msg, options}) do
+    info("Creating docker image ...")
+    config = ImageConfig.from_config(artifact_config)
+
+    {:ok, :step_build_image, config, options}
+    |> substep_import_image
+    |> substep_tag_latest_image
+    |> substep_return_options
+  end
+
+  defp substep_import_image({:error, _, _, _} = error), do: error
+  defp substep_import_image({_result, _msg, config, options}) do
+    image_command = "cat #{tarball_dir}/#{config.tarball} | #{@docker_import} #{config.settings} - #{config.tagged_name}"
+
+    options.writer.("$> #{image_command}\n")
+    case do_cmd(image_command, options.writer) do
+      0 ->
+        info("Docker image created: #{config.tagged_name}")
+
+        usage_info = """
+
+            You can try your freshly packaged image with:
+
+            $ docker run --rm #{config.tagged_name}
+
+            Or if you have a Phoenix app:
+
+            $ docker run --rm -e "PORT=4000" -p 4000:4000 #{config.tagged_name}
+
+        """
+        print(usage_info)
+
+        {:ok, :image_import, config, options}
+      _ ->
+        {:error, "Creation of Docker image `#{config.tagged_name}` failed! Check for any errors above.", config, options}
     end
   end
 
-  defp parse_tarball_option({opts, vars, tarball}) do
-    case tarball do
-      "true" -> {opts, ["TARBALL=true" | vars]}
-      "only" -> {opts, ["TARBALL=only" | vars]}
-      _      -> {opts, vars}
+  defp substep_tag_latest_image({:error, _, _, _} = error), do: error
+  defp substep_tag_latest_image({_result, _msg, config, options}) do
+    tag_command = "#{@docker_tag} #{config.tagged_name} #{config.name}:latest"
+
+    options.writer.("$> #{tag_command}\n")
+    case do_cmd(tag_command, options.writer) do
+      0 ->
+        info("Docker image tagged as latest: #{config.tagged_name} -> #{config.name}:latest")
+        {:ok, :image_import, config, options}
+      _ ->
+        {:error, "Creation of Docker image `#{config.tagged_name}` failed! Check for any errors above.", config, options}
     end
   end
+
+  defp substep_return_options({result, msg, _config, options}), do: {result, msg, options}
+
+  defp evaluate_success_or_error({:ok, _, _}) do
+    info "Packaging was successful! \\o/"
+    :ok
+  end
+  defp evaluate_success_or_error({:error, msg, _}) do
+    error("An error happened!")
+    error("Reason: #{msg}")
+    abort!
+  end
+
+  defp current_dir,     do: System.cwd!
+  defp tarball_dir,     do: current_dir <> "/" <> @tarball_dir_name
+  defp artifact_config, do: tarball_dir <> "/" <> @artifact_config
+
+  defp volumes do
+    [
+      "-v #{current_dir}:#{@container_source_dir}",
+      "-v #{tarball_dir}:#{@container_tarball_dir}"
+    ]
+    |> Enum.join(" ")
+  end
+
+  defp release_settings(options), do: Settings.from_package_options(options.package)
+
+  defp has_exrm?,      do: project_deps |> Dict.has_key?(:exrm)
+  defp project_deps,   do: project_config |> Dict.get(:deps)
+  defp project_config, do: Mix.Project.config
 end

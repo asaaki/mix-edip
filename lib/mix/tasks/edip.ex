@@ -32,15 +32,6 @@ defmodule Mix.Tasks.Edip do
       mix edip --prefix <PREFIX>
       mix edip -p <PREFIX>
 
-      # Get the tarball from the packaging (true), without even creating the docker image (only).
-      # The tarballs can be found in the `.edip/tarballs` directory.
-      mix edip --tarball true|only
-      mix edip -a true|only
-
-      # Force redownload of EDIP tool
-      mix edip --force
-      mix edip -f
-
       # Silence build output of EDIP (will be logged to `.edip.log` instead).
       mix edip --silent
       mix edip -s
