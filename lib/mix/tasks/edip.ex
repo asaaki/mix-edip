@@ -9,14 +9,25 @@ defmodule Mix.Tasks.Edip do
       defp deps do
         [
           {:exrm, "~> 0.18"},
-          {:edip, "~> 0.2"}
+          {:edip, "~> 0.3"}
         ]
       end
 
-  ## Usage
+  Then run:
 
       mix deps.get edip && mix deps.compile edip
+
+  Or install as mix archive:
+
+      mix archive.install https://github.com/asaaki/mix-edip/releases/download/v0.3.0/edip-0.3.0.ez
+
+  ## Usage
+
       mix edip
+
+  ## Help
+
+      mix help edip
 
   ## Options
 
