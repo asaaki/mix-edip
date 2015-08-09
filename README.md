@@ -13,6 +13,8 @@ A mix task for [EDIP (elixir docker image packager)](https://github.com/asaaki/e
 ## TOC
 
 - [Install](#install)
+  - [Project dependency](#project-dependency)
+  - [mix archive](#mix-archive)
 - [Usage](#usage)
 - [Help](#help)
 - [Options](#options)
@@ -22,6 +24,8 @@ A mix task for [EDIP (elixir docker image packager)](https://github.com/asaaki/e
 EDIP creates a docker image of your application release.
 
 ## Install
+
+### Project dependency
 
 In mix.exs:
 
@@ -36,9 +40,20 @@ Then run:
 
     mix deps.get edip && mix deps.compile edip
 
-Or install as mix archive:
+### mix archive
 
-    mix archive.install https://github.com/asaaki/mix-edip/releases/download/v0.3.0/edip-0.3.0.ez
+Just run this and confirm:
+
+    mix archive.install \
+      https://github.com/asaaki/mix-edip/releases/download/v0.3.0/edip-0.3.0.ez
+
+Adn don't forget to add `exrm` to your project:
+
+    defp deps do
+      [
+        {:exrm, "~> 0.18"}
+      ]
+    end
 
 ## Usage
 

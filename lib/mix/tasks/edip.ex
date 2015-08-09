@@ -4,6 +4,8 @@ defmodule Mix.Tasks.Edip do
 
   ## Install
 
+  ### Project dependency
+
   In mix.exs:
 
       defp deps do
@@ -17,9 +19,20 @@ defmodule Mix.Tasks.Edip do
 
       mix deps.get edip && mix deps.compile edip
 
-  Or install as mix archive:
+  ### mix archive
 
-      mix archive.install https://github.com/asaaki/mix-edip/releases/download/v0.3.0/edip-0.3.0.ez
+  Just run this and confirm:
+
+      mix archive.install \\
+        https://github.com/asaaki/mix-edip/releases/download/v0.3.0/edip-0.3.0.ez
+
+  Adn don't forget to add `exrm` to your project:
+
+      defp deps do
+        [
+          {:exrm, "~> 0.18"}
+        ]
+      end
 
   ## Usage
 
