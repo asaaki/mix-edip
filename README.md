@@ -80,5 +80,13 @@ Adn don't forget to add `exrm` to your project:
     mix edip --silent
     mix edip -s
 
+    # Map additional volumes for use while building the release
+    mix edip --mapping <FROM>:<TO>[:<OPTION>]
+    mix edip -m <FROM>:<TO>[:<OPTION>]
+
+To pull dependencies stored in private github repositories you will need to make your SSH keys accessible from the container doing the build:
+
+mix edip --mapping /path/to/home/.ssh:/root/ssh.
+
 If `--name` and `--prefix` are given, the name option takes precedence (prefix will be ignored).
 <!-- endmoduledoc: Mix.Tasks.Edip -->

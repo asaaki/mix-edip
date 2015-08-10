@@ -1,8 +1,17 @@
 defmodule Edip.Settings do
+  alias Edip.Options.Mapping
   def from_package_options(options) do
     parse_package_options(options)
     |> Enum.map_join(" ", &(~s(-e "#{&1}")))
   end
+
+  def from_mapping_options(options) do
+    options |>
+    Enum.map_join(" ", &(~s(-v "#{mapping_to_string(&1)}")))
+  end
+
+  defp mapping_to_string(m = %Mapping{options: nil}), do: "#{m.from}:#{m.to}"
+  defp mapping_to_string(m = %Mapping{}), do: "#{m.from}:#{m.to}:#{m.options}"
 
   defp parse_package_options(options) do
     {_, vars} =
