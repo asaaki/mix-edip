@@ -4,7 +4,7 @@ defmodule Edip.Runner do
   alias Edip.ImageConfig
   alias Edip.Settings
 
-  @edip_version          "0.3.0"
+  @edip_version          "0.4.2"
   @edip_tool             "asaaki/edip-tool:#{@edip_version}"
   @docker_cmd            "docker"
   @docker_run            "#{@docker_cmd} run --rm"
@@ -81,7 +81,7 @@ defmodule Edip.Runner do
   defp step_build_artifact({:error, _, _} = error), do: error
   defp step_build_artifact({_result, _msg, options}) do
     info("Creating artifact (might take a while) ...")
-    command = "#{@docker_run} #{volumes} #{release_settings(options)} #{@edip_tool}"
+    command = "#{@docker_run} #{volumes(options)} #{release_settings(options)} #{@edip_tool}"
 
     options.writer.("$> #{command}\n")
     case do_cmd(command, options.writer) do
@@ -162,8 +162,9 @@ defmodule Edip.Runner do
   defp tarball_dir,     do: current_dir <> "/" <> @tarball_dir_name
   defp artifact_config, do: tarball_dir <> "/" <> @artifact_config
 
-  defp volumes do
+  defp volumes(options) do
     [
+      Settings.from_mapping_options(options.mappings),
       "-v #{current_dir}:#{@container_source_dir}",
       "-v #{tarball_dir}:#{@container_tarball_dir}"
     ]
