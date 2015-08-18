@@ -23,7 +23,7 @@ defmodule Mix.Tasks.Edip do
 
   Just run this and confirm:
 
-      mix archive.install http://git.io/edip-0.4.0.ez
+      mix archive.install http://git.io/edip-0.4.1.ez
 
   Adn don't forget to add `exrm` to your project:
 
