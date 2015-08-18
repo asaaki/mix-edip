@@ -1,9 +1,12 @@
 all:
-	@echo Use publish or gitio
+	@echo Use publish, archive or gitio
 
 publish:
 	@mix hex.publish && \
 	MIX_ENV=docs mix hex.docs
+
+archive:
+	@mix compile && mix archive.build
 
 gitio:
 	@[ -n "$(VERSION)" ] && \
