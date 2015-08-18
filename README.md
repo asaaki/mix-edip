@@ -31,8 +31,8 @@ In mix.exs:
 
     defp deps do
       [
-        {:exrm, "~> 0.18"},
-        {:edip, "~> 0.3"}
+        {:exrm, "~> 0.19"},
+        {:edip, "~> 0.4"}
       ]
     end
 
@@ -44,13 +44,13 @@ Then run:
 
 Just run this and confirm:
 
-    mix archive.install http://git.io/edip-0.3.0.ez
+    mix archive.install http://git.io/edip-0.4.0.ez
 
 Adn don't forget to add `exrm` to your project:
 
     defp deps do
       [
-        {:exrm, "~> 0.18"}
+        {:exrm, "~> 0.19"}
       ]
     end
 

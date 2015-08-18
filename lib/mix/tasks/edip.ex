@@ -10,8 +10,8 @@ defmodule Mix.Tasks.Edip do
 
       defp deps do
         [
-          {:exrm, "~> 0.18"},
-          {:edip, "~> 0.3"}
+          {:exrm, "~> 0.19"},
+          {:edip, "~> 0.4"}
         ]
       end
 
@@ -23,14 +23,13 @@ defmodule Mix.Tasks.Edip do
 
   Just run this and confirm:
 
-      mix archive.install \\
-        https://github.com/asaaki/mix-edip/releases/download/v0.3.0/edip-0.3.0.ez
+      mix archive.install http://git.io/edip-0.4.0.ez
 
   Adn don't forget to add `exrm` to your project:
 
       defp deps do
         [
-          {:exrm, "~> 0.18"}
+          {:exrm, "~> 0.19"}
         ]
       end
 
