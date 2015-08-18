@@ -4,7 +4,7 @@ defmodule Edip.Runner do
   alias Edip.ImageConfig
   alias Edip.Settings
 
-  @edip_version          "0.4.2"
+  @edip_version          "0.4.3"
   @edip_tool             "asaaki/edip-tool:#{@edip_version}"
   @docker_cmd            "docker"
   @docker_run            "#{@docker_cmd} run --rm"
