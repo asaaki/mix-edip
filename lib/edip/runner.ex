@@ -7,7 +7,7 @@ defmodule Edip.Runner do
   @edip_version          "0.4.3"
   @edip_tool             "asaaki/edip-tool:#{@edip_version}"
   @docker_cmd            "docker"
-  @docker_run            "#{@docker_cmd} run --rm"
+  @docker_run            "#{@docker_cmd} run --privileged"
   @docker_import         "#{@docker_cmd} import"
   @docker_tag            "#{@docker_cmd} tag --force"
   @tarball_dir_name      "tarballs"
