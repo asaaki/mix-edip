@@ -7,7 +7,7 @@ defmodule Edip.Mixfile do
     [
       app:         :edip,
       name:        "edip",
-      version:     "0.4.1",
+      version:     "0.4.2",
       elixir:      "~> 1.0",
       description: description,
       docs:        &docs/0,
@@ -39,7 +39,7 @@ defmodule Edip.Mixfile do
   defp package do
     [
       files:        ["lib", "tasks", "mix.exs", "README.md", "LICENSE"],
-      contributors: ["Christoph Grabo"],
+      maintainers:  ["Christoph Grabo"],
       licenses:     ["MIT"],
       links: %{
         "GitHub": "https://github.com/asaaki/mix-edip",
