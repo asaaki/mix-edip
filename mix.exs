@@ -28,11 +28,9 @@ defmodule Edip.Mixfile do
   end
 
   defp docs do
-    {ref, 0} = System.cmd("git", ["rev-parse", "--verify", "--quiet", "HEAD"])
     [
-      source_ref: ref,
-      readme:     "README.md",
-      main:       "README"
+      main: "extra-readme",
+      extras: ["README.md"]
     ]
   end
 
