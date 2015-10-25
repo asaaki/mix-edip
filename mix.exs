@@ -3,11 +3,13 @@ Code.eval_file "tasks/readme.exs"
 defmodule Edip.Mixfile do
   use Mix.Project
 
+  @version "0.4.2"
+
   def project do
     [
       app:         :edip,
       name:        "edip",
-      version:     "0.4.2",
+      version:     @version,
       elixir:      "~> 1.0",
       description: description,
       docs:        &docs/0,
@@ -29,8 +31,10 @@ defmodule Edip.Mixfile do
 
   defp docs do
     [
-      main: "extra-readme",
-      extras: ["README.md"]
+      extras:     ["README.md"],
+      main:       "extra-readme",
+      source_ref: "v#{@version}",
+      source_url: "https://github.com/asaaki/mix-edip"
     ]
   end
 
@@ -49,7 +53,7 @@ defmodule Edip.Mixfile do
 
   defp deps do
     [
-      { :ex_doc,  "~> 0.8", only: :docs },
+      { :ex_doc,  "~> 0.10", only: :docs },
       { :earmark, "~> 0.1", only: :docs }
     ]
   end
