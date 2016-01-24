@@ -1,3 +1,9 @@
+----
+
+**Outdated/Deprecated** - Please use [mix-edib](https://github.com/edib-tool/mix-edib) instead.
+
+----
+
 # EDIP mix task
 
 A mix task for [EDIP (elixir docker image packager)](https://github.com/asaaki/elixir-docker-image-packager).
